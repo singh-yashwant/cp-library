@@ -7,11 +7,14 @@ int n;
 
 // adj_list is represented as a map from int(node) to vector of pairs,
 // where each pair is {edge_length, next_node}
+// default greater compartor is used to implement min-priority queue
+
+// don't forget to modify int to long long if required, same for value of INF
 
 void dijkstra(int node){
     dist.assign(n+1, INF);
     dist[node] = 0;
-    priority_queue<pair<int, int>, vector<pair<int, int>>>q;
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>>q;
     q.push({0, node});
 
     while(!q.empty()){
