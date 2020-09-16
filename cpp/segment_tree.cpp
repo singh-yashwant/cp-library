@@ -7,6 +7,14 @@ using LL = long long;
 int n, q;
 vector<LL> arr, seg_tree;
 
+// modify this function according the type of segment tree used eg, sum/min/max/xor
+LL operation(LL x, LL y){
+    // return x+y;
+    return x^y;
+    // return min(x, y);
+    // return max(x, y);
+}
+
 void build(int v, int tl, int tr){
     if(tl == tr)
         seg_tree[v] = arr[tl];
@@ -14,11 +22,10 @@ void build(int v, int tl, int tr){
         int tm = (tl + tr)/2;
         build(2*v+1, tl, tm);
         build(2*v+2, tm+1, tr);
-        seg_tree[v] = seg_tree[2*v+1] + seg_tree[2*v+2];
+        seg_tree[v] = operation(seg_tree[2*v+1], seg_tree[2*v+2]);
     }
 }
 
-// single index update query
 void update(int v, int tl, int tr, int ind, LL val){
     if(tl == tr)
         seg_tree[v] = val;
@@ -26,17 +33,18 @@ void update(int v, int tl, int tr, int ind, LL val){
         int tm = (tl + tr)/2;
         if(ind <= tm)update(2*v+1, tl, tm, ind, val);
         else update(2*v+2, tm+1, tr, ind, val);
-        seg_tree[v] = seg_tree[2*v+1] + seg_tree[2*v+2];
+        seg_tree[v] = operation(seg_tree[2*v+1], seg_tree[2*v+2]);
     }
 }
 
-LL sum_query(int v, int tl, int tr, int l, int r){
+LL query(int v, int tl, int tr, int l, int r){
+    // modify following line and operation function according to the type of query
     if(l > tr || r < tl)
-        return 0;
+        return 0;       // 0 for Sum/XOR,  INF for Min,   -INF for Max 
     if(tl >= l && tr <= r)return seg_tree[v];
     else{
         int tm = (tl + tr)/2;
-        return sum_query(2*v+1, tl, tm, l, r) + sum_query(2*v+2, tm+1, tr, l, r);
+        return operation(query(2*v+1, tl, tm, l, r), query(2*v+2, tm+1, tr, l, r));
     }
 }
 
@@ -47,10 +55,18 @@ void solve(){
     RANGE(j,n)cin >> arr[j];
     build(0, 0, n-1);
     RANGE(j,q){
-        int t, l, r;
-        cin >> t >> l >> r;
-        if(t == 1)update(0, 0, n-1, l-1, r);
-        else cout << sum_query(0, 0, n-1, l-1, r-1) << endl;
+        int t;
+        cin >> t;
+        if(t == 1){
+            // perform the update
+            
+        }
+        else{
+            // answer the query
+            int l, r;
+            cin >> l >> r;
+            cout << query(0, 0, n-1, l-1, r-1) << endl;
+        }
     }
 }
 
@@ -60,8 +76,9 @@ int main(){
     //freopen("output.txt", "w", stdout);
 
     int t = 1;
-    for(int i = 0; i < t; ++i)
+    for(int i = 0; i < t; ++i){
         solve();
+    }
 
     return 0;
 }
