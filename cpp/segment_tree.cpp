@@ -1,0 +1,73 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define RANGE(i, n) for (int i = 0; i < n; ++i)
+using LL = long long;
+
+int n, q;
+vector<LL> arr, seg_tree;
+
+void build(int v, int tl, int tr){
+    if(tl == tr)
+        seg_tree[v] = arr[tl];
+    else{
+        int tm = (tl + tr)/2;
+        build(2*v+1, tl, tm);
+        build(2*v+2, tm+1, tr);
+        seg_tree[v] = seg_tree[2*v+1] + seg_tree[2*v+2];
+    }
+}
+
+// single index update query
+void update(int v, int tl, int tr, int ind, LL val){
+    if(tl == tr)
+        seg_tree[v] = val;
+    else{
+        int tm = (tl + tr)/2;
+        if(ind <= tm)update(2*v+1, tl, tm, ind, val);
+        else update(2*v+2, tm+1, tr, ind, val);
+        seg_tree[v] = seg_tree[2*v+1] + seg_tree[2*v+2];
+    }
+}
+
+LL sum_query(int v, int tl, int tr, int l, int r){
+    if(l > tr || r < tl)
+        return 0;
+    if(tl >= l && tr <= r)return seg_tree[v];
+    else{
+        int tm = (tl + tr)/2;
+        return sum_query(2*v+1, tl, tm, l, r) + sum_query(2*v+2, tm+1, tr, l, r);
+    }
+}
+
+void solve(){
+    cin >> n >> q;
+    arr.assign(n, 0);
+    seg_tree.assign(4*n, 0);
+    RANGE(j,n)cin >> arr[j];
+    build(0, 0, n-1);
+    RANGE(j,q){
+        int t, l, r;
+        cin >> t >> l >> r;
+        if(t == 1)update(0, 0, n-1, l-1, r);
+        else cout << sum_query(0, 0, n-1, l-1, r-1) << endl;
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    // freopen("input.txt", "r", stdin);
+    //freopen("output.txt", "w", stdout);
+
+    int t = 1;
+    for(int i = 0; i < t; ++i)
+        solve();
+
+    return 0;
+}
+
+
+
+/* complie flags
+-Wall -Wextra -pedantic -std=c++11 -O2 -Wshadow -Wformat=2 -Wfloat-equal -Wconversion -Wlogical-op -Wshift-overflow=2 -Wduplicated-cond -Wcast-qual -Wcast-align -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_FORTIFY_SOURCE=2 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover -fstack-protector
+*/
